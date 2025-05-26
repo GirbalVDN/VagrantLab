@@ -1,0 +1,1 @@
+{"virtualbox":{"/tmp/vagrant":{"type":"virtualbox","guestpath":"/tmp/vagrant","hostpath":"C:/SOC/git/VagrantLab/token","disabled":false,"__vagrantfile":true},"/vagrant":{"guestpath":"/vagrant","hostpath":"C:/SOC/git/VagrantLab","disabled":false,"__vagrantfile":true}}}

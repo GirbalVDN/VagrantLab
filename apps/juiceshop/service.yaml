@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: juice-shop
+  namespace: juiceshop
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  type: NodePort
+  selector:
+    app: juice-shop
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 3000

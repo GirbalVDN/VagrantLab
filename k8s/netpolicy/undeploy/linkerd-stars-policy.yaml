@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: frontend-sa
+  namespace: stars
+---
+apiVersion: policy.linkerd.io/v1alpha1
+kind: MeshTLSAuthentication
+metadata:
+  name: frontend-meshtls-sa
+  namespace: stars
+spec:
+  identityRefs:
+    - kind: ServiceAccount
+      name: frontend-sa
+---
+apiVersion: policy.linkerd.io/v1beta1
+kind: Server
+metadata:
+  name: backend-server-policy
+  namespace: stars
+spec:
+  podSelector:
+    matchLabels:
+      role: backend
+  port: 6379
+---
+apiVersion: policy.linkerd.io/v1alpha1
+kind: AuthorizationPolicy
+metadata:
+  name: backend-auth-policy
+  namespace: stars
+spec:
+  targetRef:
+    group: policy.linkerd.io
+    kind: Server
+    name: backend-server-policy
+  requiredAuthenticationRefs:
+    - name: frontend-meshtls-sa
+      kind: MeshTLSAuthentication
+      group: policy.linkerd.io
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: management-ui-sa
+  namespace: management-ui
+---
+apiVersion: policy.linkerd.io/v1alpha1
+kind: MeshTLSAuthentication
+metadata:
+  name: management-ui-meshtls-sa
+  namespace: management-ui
+spec:
+  identityRefs:
+    - kind: ServiceAccount
+      name: management-ui-sa
+---
+apiVersion: policy.linkerd.io/v1alpha1
+kind: AuthorizationPolicy
+metadata:
+  name: backend-auth-policy-2
+  namespace: stars
+spec:
+  targetRef:
+    group: policy.linkerd.io
+    kind: Server
+    name: backend-server-policy
+  requiredAuthenticationRefs:
+    - name: management-ui-meshtls-sa
+      kind: MeshTLSAuthentication
+      group: policy.linkerd.io

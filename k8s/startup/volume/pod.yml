@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: local-pv-pod
+spec:
+  containers:
+    - name: local-pv-container
+      image: reg.ntl.nc/proxy/library/nginx
+      ports:
+        - containerPort: 80
+          name: "http-server"
+      volumeMounts:
+        - mountPath: "/tmp/storage"
+          name: local-pv-storage
+
+  volumes:
+    - name: local-pv-storage
+      persistentVolumeClaim:
+        claimName: local-pv-claim
+

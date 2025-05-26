@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world-service
+  namespace: hello-world
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  # match deployment selector
+  selector:
+    app: hello-world
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

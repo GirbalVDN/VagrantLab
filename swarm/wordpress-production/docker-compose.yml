@@ -1,0 +1,47 @@
+services:
+  db:
+    image: reg.ntl.nc/proxy/library/mariadb:latest
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=somewordpress
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=wordpress
+      - MYSQL_PASSWORD=quah0thohc9iefoh4aez1Ohzi7geiVo7
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+
+  wordpress:
+    image: reg.ntl.nc/proxy/library/wordpress:latest
+    ports:
+      - 8080:80
+    restart: always
+    volumes:
+      - wp_data:/var/www/html
+    environment:
+      - WORDPRESS_DB_HOST=db
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=quah0thohc9iefoh4aez1Ohzi7geiVo7
+      - WORDPRESS_DB_NAME=wordpress
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+
+volumes:
+  wp_data:
+    driver: local
+    driver_opts:
+       o: bind
+       type: none
+       device: /mnt/supersite-localhost/wp_data
+  db_data:
+    driver: local
+    driver_opts:
+       o: bind
+       type: none
+       device: /mnt/supersite-localhost/db_data
+

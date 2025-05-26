@@ -1,0 +1,7 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: stars
+  annotations:
+    linkerd.io/inject: enabled
+    config.linkerd.io/default-inbound-policy: cluster-authenticated

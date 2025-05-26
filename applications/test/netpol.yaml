@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: netpol
+  namespace: argocd
+spec:
+  destination:
+    namespace: netpol
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: 'https://github.com/AndreGirbal/VagrantLab.git'
+    path: k8s/netpolicy
+  syncPolicy:
+    automated: {}

@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hello-world-ingress
+  namespace: hello-world
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    openappsec.io/policy: open-appsec-best-practice-policy
+spec:
+  ingressClassName: appsec-nginx
+  rules:
+    - host: helloworld.local.lan
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name:  hello-world-service
+                port:
+                  number: 80

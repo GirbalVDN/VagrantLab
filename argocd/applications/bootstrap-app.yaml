@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  # Without the resources-finalizer.argocd.argoproj.io finalizer, deleting an application will not delete the resources it manages.
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  name: bootstrap-app
+  # the namespace here must match the namespace of our Argo CD instance
+  namespace: argocd
+spec:
+  source:
+    path: applications/bootstrap
+    repoURL: 'https://github.com/AndreGirbal/VagrantLab.git'
+    targetRevision: main
+  destination:
+    server: 'https://kubernetes.default.svc'
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
