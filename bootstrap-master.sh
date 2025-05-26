@@ -80,5 +80,10 @@ tar -xvzf kubeseal-${KUBESEAL_VERSION:?}-linux-amd64.tar.gz kubeseal
 sudo install -m 755 kubeseal /usr/local/bin/kubeseal
 # to get the public cert: kubeseal --controller-namespace sealed-secrets --controller-name sealed-secrets-controller --fetch-cert
 
+#install cillium CNI
+helm repo add cilium https://helm.cilium.io/
+helm repo update
+helm install cilium cilium/cilium
+
 #echo "nameserver 8.8.8.8" | sudo tee    /etc/resolv.conf
 #echo "nameserver 1.1.1.1" | sudo tee -a /etc/resolv.conf
