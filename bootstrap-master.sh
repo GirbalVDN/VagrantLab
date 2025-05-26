@@ -32,12 +32,13 @@ mkdir -p /etc/rancher/k3s
 
 sudo apt-get -y autoremove
 
-wget https://github.com/k3s-io/k3s/releases/download/v1.30.5%2Bk3s1/k3s -q --show-progress
+#wget https://github.com/k3s-io/k3s/releases/download/v1.30.5%2Bk3s1/k3s -q --show-progress
+wget https://github.com/k3s-io/k3s/releases/download/v1.33.0%2Bk3s1/k3s -q --show-progress
 chmod +x k3s && sudo mv k3s /usr/local/bin/ 
 
 cd /home/vagrant && echo "alias k=kubectl" >> .bashrc && source .bashrc
-wget https://dl.k8s.io/release/v1.30.5/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
-wget https://get.helm.sh/helm-v3.16.2-linux-amd64.tar.gz && tar -zxvf helm-v3.16.2-linux-amd64.tar.gz && sudo mv linux-amd64/helm /usr/local/bin/
+wget https://dl.k8s.io/release/v1.33.0/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+wget https://get.helm.sh/helm-v3.18.0-linux-amd64.tar.gz && tar -zxvf helm-v3.18.0-linux-amd64.tar.gz && sudo mv linux-amd64/helm /usr/local/bin/
 
 sudo touch /lib/systemd/system/k3s.service
 sudo cat <<EOF >>/lib/systemd/system/k3s.service
@@ -47,7 +48,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/k3s server --bind-address 192.168.56.100 --disable traefik --disable servicelb --disable local-storage --flannel-iface eth1
+ExecStart=/usr/local/bin/k3s server --bind-address 192.168.56.100 --disable-network-policy --disable-kube-proxy --flannel-backend none --disable traefik --disable servicelb --disable local-storage
 
 [Install]
 WantedBy=multi-user.target
@@ -66,7 +67,7 @@ helm upgrade --install argocd argo/argo-cd --namespace argocd --create-namespace
 sleep 15
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d > /home/vagrant/argocd.pass
 
-KUBESEAL_VERSION='0.27.2'
+KUBESEAL_VERSION='0.29.0'
 # Install Bitnami's Sealed Secrets controller in the sealed-secrets namespace.
 helm repo add bitnami-labs https://bitnami-labs.github.io/sealed-secrets/
 helm install -n sealed-secrets --create-namespace --wait --version ${KUBESEAL_VERSION:?} sealed-secrets-controller bitnami-labs/sealed-secrets

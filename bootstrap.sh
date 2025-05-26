@@ -44,7 +44,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/k3s agent --server https://192.168.56.100:6443 --flannel-iface eth1 --token-file /tmp/vagrant/node-token
+ExecStart=/usr/local/bin/k3s agent --server https://192.168.56.100:6443 --token-file /tmp/vagrant/node-token
 
 [Install]
 WantedBy=multi-user.target
