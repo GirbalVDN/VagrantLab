@@ -1,7 +1,7 @@
 import json
 import os
 import csv
-from io import StringIO
+from io import StringIO, BytesIO
 from flask import Flask, request, jsonify, send_file
 from flask_restx import Api, Resource, fields
 
