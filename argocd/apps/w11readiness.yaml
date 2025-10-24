@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: win11-readiness-app
+  namespace: argocd 
+spec:
+  project: default
+  source:
+    # URL de votre repo GitHub contenant les manifests K8s (deployment, service, pvc)
+    repoURL: https://github.com/GirbalVDN/VagrantLab.git 
+    targetRevision: HEAD
+    path: apps/W11readiness/_k8s # Par exemple, le répertoire 'k8s' dans votre repo
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: w11readiness # Le namespace où déployer
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
