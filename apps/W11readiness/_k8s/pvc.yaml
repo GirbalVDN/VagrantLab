@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: win11-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce # Seul un Pod à la fois peut monter ce volume en lecture/écriture
+  resources:
+    requests:
+      storage: 1Gi # Demander 1 Gigaoctet (largement suffisant pour du JSON)
