@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: win11-readiness-api
+  labels:
+    app: win11-readiness-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: win11-readiness-api
+  template:
+    metadata:
+      labels:
+        app: win11-readiness-api
+    spec:
+      volumes:
+        # Volume qui sera monté dans le conteneur
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: win11-data-pvc
+      containers:
+      - name: api-container
+        # Remplacer par l'emplacement de votre image Docker (ex: monregistre/win11-readiness:latest)
+        image: <VOTRE_IMAGE_DOCKER_ICI> 
+        ports:
+        - containerPort: 5000
+        # Monter le volume au chemin où l'API sauve le fichier
+        volumeMounts:
+        - name: data-storage
+          mountPath: /app 
+        # S'assurer que le liveness/readiness check est configuré pour la production
