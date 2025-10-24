@@ -114,7 +114,7 @@ class RecordList(Resource):
             if not all_data:
                 return {'message': 'Aucune donnée enregistrée à exporter.'}, 200
 
-            # Préparation du fichier CSV en mémoire (pour l'efficacité)
+            # Préparation du fichier CSV en mémoire
             si = StringIO()
             cw = csv.writer(si)
             
@@ -129,15 +129,26 @@ class RecordList(Resource):
                 row = [name] + [str(data.get(k, 'N/A')) for k in data_keys]
                 cw.writerow(row)
 
+            # --- DÉBUT DE LA CORRECTION ---
+            
+            # 1. Obtenir la chaîne de caractères du CSV
             output = si.getvalue()
+            
+            # 2. Importer BytesIO pour la gestion binaire
+            from io import BytesIO
+            
+            # 3. Encoder la chaîne CSV en UTF-8 et la placer dans un flux binaire (BytesIO)
+            binary_output = BytesIO(output.encode('utf-8'))
             
             # Renvoyer le fichier CSV
             return send_file(
-                StringIO(output),
+                # Utilisation de BytesIO à la place de StringIO
+                binary_output, 
                 mimetype='text/csv',
                 as_attachment=True,
                 download_name='windows_11_readiness_export.csv'
             )
+            # --- FIN DE LA CORRECTION ---
 
 # --- Exécution ---
 
