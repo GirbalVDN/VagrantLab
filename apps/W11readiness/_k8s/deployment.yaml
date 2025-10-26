@@ -25,6 +25,19 @@ spec:
         image: <VOTRE_IMAGE_DOCKER_ICI> 
         ports:
         - containerPort: 5000
+        # --- NOUVEAU: INJECTION DES SECRETS ---
+        env:
+        - name: POST_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: win11-api-keys
+              key: POST_API_KEY
+        - name: GET_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: win11-api-keys
+              key: GET_API_KEY
+        # -------------------------------------
         # Monter le volume au chemin où l'API sauve le fichier
         volumeMounts:
         - name: data-storage
