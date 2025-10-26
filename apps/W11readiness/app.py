@@ -7,6 +7,18 @@ from flask_restx import Api, Resource, fields
 
 # --- Configuration et Initialisation ---
 
+# --- NOUVEAU: SECRETS D'AUTHENTIFICATION ---
+# Lire les variables d'environnement ou utiliser une valeur par défaut de 'DEV_SECRET'
+# La valeur par défaut est uniquement pour faciliter le développement local. 
+# En K8s, ces variables seront TOUJOURS définies.
+POST_SECRET_KEY = os.environ.get("POST_API_KEY", "DEV_SECRET_POST") 
+GET_SECRET_KEY = os.environ.get("GET_API_KEY", "DEV_SECRET_GET")    
+
+# --- Vérification de base (recommandée) ---
+if POST_SECRET_KEY == "DEV_SECRET_POST" or GET_SECRET_KEY == "DEV_SECRET_GET":
+    print("ATTENTION: L'application utilise des secrets par défaut. NE PAS UTILISER EN PRODUCTION!")
+# ------------------------------------------
+
 # Nom du fichier pour le stockage des données
 DATA_FILE = 'hardware_readiness_data.json'
 
@@ -37,7 +49,17 @@ api = Api(app,
           title='Windows 11 Readiness API', 
           description='API pour collecter et consulter les données de compatibilité Windows 11.',
           # L'endpoint Swagger UI sera accessible à /
-          doc='/') 
+          doc='/')
+
+# --- NOUVEAU: Définition de la sécurité pour Swagger UI ---
+api.security = {
+    'apiKey': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'X-API-KEY'
+    }
+}
+# --------------------------------------------------------
 
 # Création d'un namespace pour notre ressource
 ns = api.namespace('record', description='Opérations de collecte et consultation')
@@ -61,14 +83,20 @@ post_request_model = api.model('PostRecord', {
 @ns.route('/')
 class RecordList(Resource):
     
-    @ns.doc('post_hardware_data')
+    @ns.doc('post_hardware_data', security=[{'apiKey': []}]) # Ajouté pour la doc Swagger
     @ns.expect(post_request_model, validate=True)
     @ns.response(201, 'Données enregistrées avec succès.')
+    @ns.response(401, 'Clé API invalide.') # Ajouté
     @ns.response(400, 'Format de requête invalide.')
     def post(self):
         """
         Enregistre les données de compatibilité d'un poste.
         """
+        # --- NOUVEAU: VÉRIFICATION DU SECRET POST ---
+        api_key = request.headers.get('X-API-KEY')
+        if api_key != POST_SECRET_KEY:
+            api.abort(401, "Accès refusé: Clé API POST invalide.")
+        # -------------------------------------------
         try:
             # Les données sont validées par Flask-RESTx grâce à @ns.expect
             payload = request.json 
@@ -90,14 +118,20 @@ class RecordList(Resource):
             api.abort(500, f"Erreur interne lors de l'enregistrement des données: {str(e)}")
 
 
-    @ns.doc('get_hardware_data')
+    @ns.doc('get_hardware_data', security=[{'apiKey': []}]) # Ajouté pour la doc Swagger
     @ns.param('Name', 'Nom du poste à rechercher (optionnel). Si absent, renvoie toutes les données au format CSV.', required=False)
     @ns.response(200, 'Données(s) retournée(s) avec succès.')
+    @ns.response(401, 'Clé API invalide.') # Ajouté
     @ns.response(404, 'Poste non trouvé.')
     def get(self):
         """
         Renvoie les données d'un poste spécifique (JSON) ou l'ensemble des données (CSV).
         """
+        # --- NOUVEAU: VÉRIFICATION DU SECRET GET ---
+        api_key = request.headers.get('X-API-KEY')
+        if api_key != GET_SECRET_KEY:
+            api.abort(401, "Accès refusé: Clé API GET invalide.")
+        # -------------------------------------------
         all_data = load_data()
         post_name = request.args.get('Name')
 
